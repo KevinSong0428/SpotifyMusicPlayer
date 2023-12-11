@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { styled, alpha, AppBar, Box, Toolbar, Typography, InputBase, Autocomplete, Grid, IconButton, Snackbar, Fade, Alert } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search"
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 
 
 const Search = styled("div")(({ theme }) => ({
@@ -44,11 +45,17 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     align: "center",
 }));
 
+const CenteredBox = styled(Box)({
+    display: 'flex',
+    alignItems: 'center',
+});
+
 // destructure props --> directly accessing onResultClick
 export default function SearchBar({ code }) {
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [message, setMessage] = useState('')
 
     const renderSong = (props, song) => {
         return (
@@ -127,11 +134,25 @@ export default function SearchBar({ code }) {
                 headers: { "Content-Type": "application/json" }
             };
             await fetch(`/spotify/add-to-queue?q=${encodeURIComponent(song.track_uri)}`, requestOptions)
+            setMessage("Successfully added to queue.")
             setSnackbarOpen(true);
         } catch (err) {
             console.log("An error occured: ", err);
         }
     };
+
+    const handleCodeClicked = async () => {
+        try {
+            console.log(code)
+            let url = `http://127.0.0.1:8000/room/${code}`
+            await navigator.clipboard.writeText(url)
+            setMessage("Copied to clipboard.")
+            setSnackbarOpen(true);
+        } catch (error) {
+            console.error("Unable to copy url to clipboard: ", error)
+        }
+
+    }
 
     return (
         <Box sx={{ flexGrow: 1 }}>
@@ -145,12 +166,21 @@ export default function SearchBar({ code }) {
                     >
                         Spotify Room
                     </Typography>
-                    <Typography
-                        variant="h4"
-                        noWrap
-                        sx={{ display: { xs: "none", sm: "block" } }}>
-                        Code: {code}
-                    </Typography>
+                    <CenteredBox>
+                        <Typography
+                            variant="h4"
+                            noWrap
+                            sx={{ display: { xs: "none", sm: "block" } }}
+                        >
+                            Code: {code}
+                        </Typography>
+                        <IconButton
+                            style={{ fontSize: "small" }}
+                            onClick={() => { handleCodeClicked() }}
+                        >
+                            <ContentCopyIcon />
+                        </IconButton>
+                    </CenteredBox>
                     <Search>
                         <SearchIconWrapper>
                             <SearchIcon />
@@ -185,7 +215,7 @@ export default function SearchBar({ code }) {
                         }}
                     >
                         <Alert onClose={() => setSnackbarOpen(false)} severity="success" sx={{ width: '100%' }}>
-                            Successfully added to queue
+                            {message}
                         </Alert>
                     </Snackbar>
                 </Toolbar>

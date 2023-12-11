@@ -24,8 +24,8 @@ export default function Room(props) {
 
     // close/stop interval when component unmounts
     useEffect(() => {
-        const getSong = setInterval(getCurrentSong, 1000) // <-- calling the function every second aka 1000
-        const getQueue = setInterval(getQueueSongs, 1000) // <-- calling the function every second aka 1000
+        const getSong = setInterval(getCurrentSong, 10000) // <-- calling the function every second aka 1000
+        const getQueue = setInterval(getQueueSongs, 10000) // <-- calling the function every second aka 1000
         return () => {
             clearInterval(getSong);
             clearInterval(getQueue);
