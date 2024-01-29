@@ -68,12 +68,12 @@ The project is currently for local development, please change in project setting
 
 ### Configure .env File
 1) Create a .env file after navigating into the project repository
-`
+```
 CLIENT_ID = your_client_id
 CLIENT_SECRET = your_client_secret
 REDIRECT_URI = your_redirect_URI
 SECRET_KEY = django_secret_key
-`
+```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -86,5 +86,5 @@ To run the website on your local server, go to the project repository and run `p
 [Django-url]: https://docs.djangoproject.com/en/5.0/
 [React-url]: https://react.dev/learn
 [Python-url]: https://www.python.org/
-[Spotify-Web-API]: https://developer.spotify.com/documentation/web-api
+[Spotify-url]: https://developer.spotify.com/documentation/web-api
 [Spotify-Dashboard]: https://developer.spotify.com/
