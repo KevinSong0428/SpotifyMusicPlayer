@@ -33,7 +33,7 @@ export default function Room(props) {
     }, [roomCode]);
 
     const getRoomDetails = () => {
-        fetch("/api/get-room" + "?code=" + roomCode)
+        fetch("/api/get-room?code=" + roomCode)
             .then((response) => {
                 console.log("get room details...")
                 if (!response.ok) {
@@ -50,12 +50,11 @@ export default function Room(props) {
                 setVotesToSkip(data.votes_to_skip);
                 setGuestCanPause(data.guest_can_pause);
                 setIsHost(data.is_host);
-                console.log("isHost: ", isHost.toString())
-                // need to authenticate user is user is host
-                if (isHost.toString()) {
+                console.log("isHost: ", data.is_host.toString())
+                // need to authenticate user if user is host
+                if (data.is_host) {
                     authenticateSpotify();
                 }
-
             })
             .catch((error) => {
                 console.log("An error occured: ", error);
