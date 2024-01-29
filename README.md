@@ -19,7 +19,7 @@
       </ul>
     </li>
     <li><a href="#getting-started">Getting Started</a></li>
-    <li><a href="#usage">Deploying on Local Server</a></li>
+    <li><a href="#deploying-on-local-server">Deploying on Local Server</a></li>
   </ol>
 </details>
 
