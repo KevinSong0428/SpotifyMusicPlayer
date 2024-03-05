@@ -11,6 +11,7 @@ from .models import Vote
 # View to authenticate application to access data
 class AuthURL(APIView):
     def get(self, request, format=None):
+        print("AUTH URL AUTHENTICATING")
         # scope is information we want to access
         scopes = "user-read-playback-state user-modify-playback-state user-read-currently-playing"
 
@@ -27,6 +28,7 @@ class AuthURL(APIView):
 
 # after we return the information from AuthURL, we will then pass that information to this callback function --> then send request with code to get access tokens
 def spotify_callback(request, format=None):
+    print("CALLBACK FUNCTION!!!")
     code = request.GET.get("code")
     error = request.GET.get("error")
 

@@ -115,6 +115,7 @@ export default function MusicPlayer(props) {
                         <Typography color="textSecondary" variant="subtitle1">{props.artist}</Typography>
                         <div>
                             <IconButton
+                                title="Play/Pause"
                                 onClick={() => {
                                     if (props.is_playing !== undefined && props.is_playing !== null) {
                                         props.is_playing ? pauseSong() : playSong()
@@ -124,10 +125,17 @@ export default function MusicPlayer(props) {
                                 {props.is_playing ? <PauseIcon /> : <PlayArrowIcon />}
                             </IconButton>
 
-                            <IconButton onClick={() => skipSong()}>
+                            <IconButton
+                                title="Skip"
+                                onClick={() => skipSong()}
+                            >
                                 <SkipNextIcon />
                             </IconButton>
-                            <IconButton onClick={toggleQueue}>
+
+                            <IconButton
+                                title="Queue"
+                                onClick={toggleQueue}
+                            >
                                 <QueueMusicIcon />
                             </IconButton>
                             <Typography color="textSecondary" variant="subtitle2">
