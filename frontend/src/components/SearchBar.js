@@ -51,7 +51,7 @@ const CenteredBox = styled(Box)({
 });
 
 // destructure props --> directly accessing onResultClick
-export default function SearchBar({ code }) {
+export default function SearchBar({ code, username }) {
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -164,7 +164,7 @@ export default function SearchBar({ code }) {
                         component="div"
                         sx={{ display: { xs: "none", sm: "block" } }}
                     >
-                        Spotify Room
+                        {username}'s Room
                     </Typography>
                     <CenteredBox>
                         <Typography

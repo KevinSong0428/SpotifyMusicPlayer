@@ -62,25 +62,15 @@ class IsAuthenticated(APIView):
         is_authenticated = is_spotify_authenticated(self.request.session.session_key)
         
         # after authenticating user, store device id to room that way any changes to music player will affect the ROOM'S music player (aka host device)
-        room_code = self.request.session.get("room_code")
-
-        roomResult = Room.objects.filter(code = room_code)
-        if roomResult.exists():
-            room = roomResult[0]
-        else:
-            return Response({}, status=status.HTTP_404_NOT_FOUND)
-        room.device_id = get_device_id(room.host)
-        room.save(update_fields=["device_id"])
+        room = getRoom(self.request.session.get("room_code"))
+        if is_authenticated:
+            room.device_id = get_device_id(room.host)
+            room.save(update_fields=["device_id"])
         return Response({"status": is_authenticated}, status=status.HTTP_200_OK)
     
 class CurrentSong(APIView):
     def get(self, request, format=None):
-        room_code = self.request.session.get("room_code")
-        roomResult = Room.objects.filter(code=room_code)
-        if roomResult.exists():
-            room = roomResult[0]
-        else:
-            return Response({"Error": "Room not found."}, status=status.HTTP_404_NOT_FOUND)
+        room = getRoom(self.request.session.get("room_code"))
         host = room.host
         endpoint = "player/currently-playing" 
 
@@ -141,13 +131,7 @@ class CurrentSong(APIView):
 class PauseSong(APIView):
     # send put request to Spotify to update state of our song
     def put(self, response, format=None):
-        room_code = self.request.session.get("room_code")
-        roomResult = Room.objects.filter(code=room_code)
-        if roomResult.exists():
-            room = roomResult[0]
-        else:
-            return Response({"Error": "Room not found."}, status=status.HTTP_404_NOT_FOUND)
-            
+        room = getRoom(self.request.session.get("room_code"))
         # check if current user is a host
         # OR see if guest_can_pause is True
         if self.request.session.session_key == room.host or room.guest_can_pause:
@@ -161,13 +145,7 @@ class PauseSong(APIView):
 class PlaySong(APIView):
     # send put request to Spotify to update state of our song
     def put(self, response, format=None):
-        room_code = self.request.session.get("room_code")
-        roomResult = Room.objects.filter(code=room_code)
-        if roomResult.exists():
-            room = roomResult[0]
-        else:
-            return Response({"Error": "Room not found."}, status=status.HTTP_404_NOT_FOUND)
-        
+        room = getRoom(self.request.session.get("room_code"))
         if self.request.session.session_key == room.host or room.guest_can_pause:
             play_or_pause_song(room.host, "play")
             # successful request, return no content
@@ -182,13 +160,7 @@ class PlaySong(APIView):
 class SkipSong(APIView):
     # creating new data aka new song
     def post(self, request, format=None):
-        room_code = self.request.session.get("room_code")
-        roomResult = Room.objects.filter(code=room_code)
-        if roomResult.exists():
-            room = roomResult[0]
-        else:
-            return Response({"Error": "Room not found."}, status=status.HTTP_404_NOT_FOUND)
-        
+        room = getRoom(self.request.session.get("room_code"))
         # prevent user from voting multiple times
         user = self.request.session.session_key
         if Vote.objects.filter(user=user).exists():
@@ -214,12 +186,7 @@ class SkipSong(APIView):
 class SearchSong(APIView):
     def get(self, request, format=None):
         print("Searching song:")
-        room_code = self.request.session.get("room_code")
-        roomResult = Room.objects.filter(code=room_code)
-        if roomResult.exists():
-            room = roomResult[0]
-        else:
-            return Response({"Error": "Room not found."}, status=status.HTTP_404_NOT_FOUND)
+        room = getRoom(self.request.session.get("room_code"))
         host = room.host
         search_query = request.GET.get('q', '') # extract search query
 
@@ -254,13 +221,7 @@ class SearchSong(APIView):
         
 class PlaySelectedSong(APIView):
     def get(self, request, format=None):
-        room_code = self.request.session.get("room_code")
-        roomResult = Room.objects.filter(code=room_code)
-        if roomResult.exists():
-            room = roomResult[0]
-        else:
-            return Response({"Error": "Room not found."}, status=status.HTTP_404_NOT_FOUND)
-        
+        room = getRoom(self.request.session.get("room_code"))
         host = room.host
         device_id = room.device_id
         track_uri = request.GET.get('q', '') # extract search query
@@ -277,12 +238,7 @@ class PlaySelectedSong(APIView):
     
 class GetQueue(APIView):
     def get(self, request, format=None):
-        room_code = self.request.session.get("room_code")
-        roomResult = Room.objects.filter(code=room_code)
-        if roomResult.exists():
-            room = roomResult[0]
-        else:
-            return Response({"Error": "Room not found."}, status=status.HTTP_404_NOT_FOUND)
+        room = getRoom(self.request.session.get("room_code"))
         host = room.host
         endpoint = "player/queue"
         response = execute_spotify_api_request(host, endpoint)
@@ -313,13 +269,7 @@ class GetQueue(APIView):
 
 class AddToQueue(APIView):
     def post(self, request, format=None):
-        room_code = self.request.session.get("room_code")
-        roomResult = Room.objects.filter(code=room_code)
-        if roomResult.exists():
-            room = roomResult[0]
-        else:
-            return Response({"Error": "Room not found."}, status=status.HTTP_404_NOT_FOUND)
-        
+        room = getRoom(self.request.session.get("room_code"))
         host = room.host
         device_id = room.device_id
         track_uri = request.GET.get('q', '') # extract search query
@@ -330,3 +280,25 @@ class AddToQueue(APIView):
             return Response({}, status=status.HTTP_404_NOT_FOUND)
        
         return Response({}, status=status.HTTP_204_NO_CONTENT)
+    
+class GetUser(APIView):
+    def get(self, request, format=None):
+        host = getRoom(self.request.session.get("room_code")).host
+        response = execute_spotify_api_request(host, '')
+
+        if "Error" in response:
+            return Response({}, status=status.HTTP_404_NOT_FOUND)
+
+        image_url = "https://upload.wikimedia.org/wikipedia/commons/2/2c/Default_pfp.svg"
+
+        if response.get("images"):
+            image_url = response.get("images")[1]["url"]
+
+        name = " ".join(word[0].upper() + word[1:].lower() for word in response.get("display_name").split())
+
+        user = {
+            "name": name,
+            "image_url": image_url
+        }
+
+        return Response(user, status=status.HTTP_200_OK)

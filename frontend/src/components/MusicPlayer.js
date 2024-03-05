@@ -1,9 +1,11 @@
 import React, { Component, useState } from "react";
-import { Grid, Typography, Card, IconButton, LinearProgress, Collapse, Box } from "@mui/material"
+import { Grid, Typography, Card, IconButton, LinearProgress, Collapse, Box, CardMedia } from "@mui/material"
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 import SkipNextIcon from '@mui/icons-material/SkipNext';
 import QueueMusicIcon from '@mui/icons-material/QueueMusic';
+import CardContent from '@mui/material/CardContent';
+import { Reorder } from "framer-motion";
 
 export default function MusicPlayer(props) {
     const { queueSongs } = props;
@@ -67,6 +69,26 @@ export default function MusicPlayer(props) {
                         </Box>
                     ))}
                 </ul>
+                {/* {queueSongs.map((song) => (
+                    <Card sx={{ display: 'flex', position: 'relative', alignItems: 'center', border: '1px solid gray', borderRadius: '0px' }}>
+                        <CardMedia
+                            component="img"
+                            sx={{ marginRight: '8px', width: '50px', height: '50px' }}
+                            image={song.image_url}
+                            alt={song.title}
+                        >
+                        </CardMedia>
+                        <Box sx={{ display: "flex", flexDirection: "column" }}>
+                            <CardContent sx={{ flex: '1 0 auto', padding: '5px' }}>
+                                <Typography variant="subtitle1">{song.title}</Typography>
+                                <Typography variant="body2" color="textSecondary">{song.artist}</Typography>
+                            </CardContent>
+                            <CardContent sx={{ position: 'absolute', bottom: 0, right: 50, padding: '4px' }}>
+                                <Typography variant="body2" color="textSecondary">{song.length}</Typography>
+                            </CardContent>
+                        </Box>
+                    </Card>
+                ))} */}
             </div>
         )
     }

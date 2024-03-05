@@ -1,8 +1,10 @@
+import requests
 from .models import SpotifyToken
 from django.utils import timezone
 from datetime import timedelta
 from django.conf import settings
 from requests import post, put, get
+from api.models import Room
 
 # BASE_URL for retrieving current song, skipping, play, pause, adding to and retriving queue
 BASE_URL = "https://api.spotify.com/v1/me/"
@@ -21,8 +23,20 @@ def get_device_id(session_id):
         "Content-Type": "application/json",
         "Authorization": "Bearer " + tokens.access_token
     }
-    response = get(BASE_URL + "player/devices", headers=headers)
-    return response.json()["devices"][0]["id"]
+    try:
+        response = get(BASE_URL + "player/devices", headers=headers)
+        if response:
+            devices = response.json()["devices"]
+            if devices:
+                return devices[0]["id"]
+            else:
+                return None
+        else:
+            print("Empty response received.")
+            return None
+    except requests.exceptions.JSONDecodeError as e:
+        print(f"Error decoding JSON: {e}")
+        return None
 
 # fucntion to save/create our token
 def update_or_create_user_token(session_id, access_token, token_type, expires_in, refresh_token):
@@ -165,3 +179,12 @@ def ms_to_min_sec(ms):
     sec, ms = divmod(ms, 1000)
     min, sec = divmod(sec, 60)
     return f"{min:02d}:{sec:02d}"
+
+def getRoom(room_code):
+    roomResult = Room.objects.filter(code=room_code)
+    if roomResult.exists():
+        room = roomResult[0]
+    else:
+        return {"Error": "Room not found."}
+    
+    return room

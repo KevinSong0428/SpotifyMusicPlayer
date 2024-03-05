@@ -13,8 +13,25 @@ export default function Room(props) {
     const [showSettings, setShowSettings] = useState(false);
     const [spotifyAuthenticated, setSpotifyAuthenticated] = useState(false);
     const [song, setSong] = useState({});
-    const [queueSongs, setQueueSongs] = useState([])
+    const [queueSongs, setQueueSongs] = useState([]);
+    const [user, setUser] = useState({});
     const navigate = useNavigate();
+
+    const setFavicon = (imageUrl) => {
+        const favicon = document.getElementById("favicon");
+        const link = document.createElement("link");
+        link.rel = "icon";
+        link.type = "image";
+        link.href = imageUrl;
+
+        // remove any existing favicon
+        while (favicon.firstChild) {
+            favicon.removeChild(favicon.firstChild);
+        }
+        console.log("image url: ", imageUrl)
+        console.log(user)
+        favicon.appendChild(link)
+    };
 
     // will run after component is first rendered
     useEffect(() => {
@@ -24,8 +41,8 @@ export default function Room(props) {
 
     // close/stop interval when component unmounts
     useEffect(() => {
-        const getSong = setInterval(getCurrentSong, 10000) // <-- calling the function every second aka 1000
-        const getQueue = setInterval(getQueueSongs, 10000) // <-- calling the function every second aka 1000
+        const getSong = setInterval(getCurrentSong, 1000) // <-- calling the function every second aka 1000
+        const getQueue = setInterval(getQueueSongs, 1000) // <-- calling the function every second aka 1000
         return () => {
             clearInterval(getSong);
             clearInterval(getQueue);
@@ -77,6 +94,14 @@ export default function Room(props) {
                             window.location.replace(data.url);
                         })
                 }
+
+            }).then(() => {
+                fetch("/spotify/get-user")
+                    .then((response) => response.json())
+                    .then((data) => {
+                        setUser(data);
+                        setFavicon(data.image_url);
+                    })
             })
     }
 
@@ -182,7 +207,7 @@ export default function Room(props) {
 
     return (
         <div>
-            <SearchBar code={roomCode} />
+            <SearchBar code={roomCode} username={user.name} />
             <Grid container spacing={1} alignItems="center" justifyContent="center" style={{ minHeight: '60vh' }}>
                 <Grid item xs={12} align="center">
                 </Grid>

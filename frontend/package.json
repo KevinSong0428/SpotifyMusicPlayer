@@ -27,6 +27,7 @@
     "@mui/icons-material": "^5.14.16",
     "@mui/material": "^5.14.15",
     "@mui/styled-engine-sc": "^6.0.0-alpha.3",
+    "framer-motion": "^11.0.8",
     "react-router": "^6.17.0",
     "react-router-dom": "^6.18.0",
     "styled-components": "^6.1.0"
